@@ -1,0 +1,44 @@
+---
+# tasks file for docker_iot-fuse_image
+#- name: Install pip
+#  yum: name=python-pip enablerepo=fedora state=present
+#  tags: docker
+
+- name: Create directory for Dockerfile
+  file: path=/root/iot-fuse state=directory
+  tags: docker
+
+- name: Provide Dockerfile
+  template: src=Dockerfile.j2 dest=/root/iot-fuse/Dockerfile
+  tags: docker
+
+- name: Provide Maven profile
+  template: src=maven_jdk.sh.j2 dest=/root/iot-fuse/maven_jdk.sh
+  tags: maven
+
+- name: Install Maven
+  copy: src=apache-maven-3.3.9-bin.zip dest=/root/iot-fuse/
+  tags: maven
+
+- name: Install Fuse
+  copy: src=jboss-fuse-full-6.2.1.redhat-084.zip dest=/root/iot-fuse/
+  tags: fuse
+
+- name: Add Fuse configuration for activemq
+  template: src=activemq.xml.j2 dest=/root/iot-fuse/activemq.xml
+  tags: fuse
+
+- name: Add Fuse user configuration
+  template: src=users.properties.j2 dest=/root/iot-fuse/users.properties
+  tags: fuse
+
+- name: Build a Docker image for the Fuse service
+#  docker_image:
+#    path: ./iot-fuse
+#    name: joschro/iot-fuse
+#    force: True
+#    pull: False
+#    state: present
+#    #tag: 7.2
+  command: /usr/bin/docker build --pull=false -t joschro/iot-fuse iot-fuse
+  tags: docker

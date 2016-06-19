@@ -1,0 +1,28 @@
+FROM joschro/base:7.2
+MAINTAINER Joachim Schröder <jos@redhat.com>
+
+LABEL Description="Fuse Container for IoT" Vendor="JOS Products" Version="1.0"
+
+EXPOSE 22 8181 61616
+
+# Add playbooks to the Docker image
+#ADD ansible /srv/example/
+#WORKDIR /srv/example
+
+RUN yum install -y unzip java-1.8.0-openjdk-devel
+COPY apache-maven-3.3.9-bin.zip /opt/
+RUN unzip /opt/apache-maven-3.3.9-bin.zip -d /opt/ && rm /opt/apache-maven-3.3.9-bin.zip && ln -s /opt/apache-maven-3.3.9/bin/mvn /usr/bin/
+COPY maven_jdk.sh /etc/profile.d/
+RUN chmod u+x /etc/profile.d/maven_jdk.sh
+RUN groupadd iot-user && useradd -m -g iot-user iot-user && echo "redhat" | passwd --stdin iot-user
+
+# Run Ansible to configure the Docker image
+#RUN ansible-playbook site.yml -c local
+#ENTRYPOINT ["/usr/local/bin/apachectl", "-DFOREGROUND"]
+
+USER iot-user
+WORKDIR /home/iot-user
+COPY jboss-fuse-full-6.2.1.redhat-084.zip ./
+RUN unzip jboss-fuse-full-6.2.1.redhat-084.zip && rm jboss-fuse-full-6.2.1.redhat-084.zip && ln -s jboss-fuse-6.2.1.redhat-084 fuse
+COPY activemq.xml fuse/etc/
+COPY users.properties fuse/etc/
