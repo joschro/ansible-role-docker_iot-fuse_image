@@ -26,3 +26,9 @@ COPY jboss-fuse-full-6.2.1.redhat-084.zip ./
 RUN unzip jboss-fuse-full-6.2.1.redhat-084.zip && rm jboss-fuse-full-6.2.1.redhat-084.zip && ln -s jboss-fuse-6.2.1.redhat-084 fuse
 COPY activemq.xml fuse/etc/
 COPY users.properties fuse/etc/
+COPY runJBossFuse.sh ./
+USER root
+RUN chown iot-user:iot-user fuse/etc/activemq.xml fuse/etc/users.properties ./runJBossFuse.sh
+RUN chmod u+x runJBossFuse.sh
+#USER iot-user
+#RUN ./runJBossFuse.sh

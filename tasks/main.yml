@@ -32,6 +32,10 @@
   template: src=users.properties.j2 dest=/root/iot-fuse/users.properties
   tags: fuse
 
+- name: Add Fuse run script
+  template: src=runJBossFuse.sh.j2 dest=/root/iot-fuse/runJBossFuse.sh
+  tags: fuse
+
 - name: Build a Docker image for the Fuse service
 #  docker_image:
 #    path: ./iot-fuse
